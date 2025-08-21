@@ -1,0 +1,103 @@
+--[[  
+Blox Fruits Script Base
+Compatível com executores mobile (Fluxus, Arceus X, Hydrogen)
+GUI com botões móveis
+]]
+
+-- Criar ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local UIListLayout = Instance.new("UIListLayout")
+
+-- Botões
+local AutoFarmBtn = Instance.new("TextButton")
+local FruitESPBtn = Instance.new("TextButton")
+local FruitCollectBtn = Instance.new("TextButton")
+
+-- Ativar no celular
+ScreenGui.Parent = game:GetService("CoreGui")
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Frame.Position = UDim2.new(0.1,0,0.2,0)
+Frame.Size = UDim2.new(0,150,0,200)
+
+UICorner.CornerRadius = UDim.new(0,12)
+UICorner.Parent = Frame
+
+UIListLayout.Parent = Frame
+UIListLayout.Padding = UDim.new(0,5)
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+
+-- Função para criar botões
+local function criarBotao(nome)
+    local Btn = Instance.new("TextButton")
+    Btn.Text = nome
+    Btn.Size = UDim2.new(0,130,0,40)
+    Btn.BackgroundColor3 = Color3.fromRGB(45,45,45)
+    Btn.TextColor3 = Color3.fromRGB(255,255,255)
+    Btn.Parent = Frame
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0,8)
+    corner.Parent = Btn
+    return Btn
+end
+
+-- Criar botões
+local AutoFarmBtn = criarBotao("Auto Farm")
+local FruitESPBtn = criarBotao("Fruit ESP")
+local FruitCollectBtn = criarBotao("Fruit Collect")
+
+-- Conectar funções (vazias por enquanto)
+AutoFarmBtn.MouseButton1Click:Connect(function()
+    print("Auto Farm ativado (a função será adicionada)")
+end)
+
+FruitESPBtn.MouseButton1Click:Connect(function()
+    print("Fruit ESP ativado (a função será adicionada)")
+end)
+
+FruitCollectBtn.MouseButton1Click:Connect(function()
+    print("Fruit Collect ativado (a função será adicionada)")
+end)
+
+-- Deixar arrastável
+local UIS = game:GetService("UserInputService")
+local dragging, dragInput, dragStart, startPos
+
+Frame.Active = true
+Frame.Draggable = true -- Alguns executores não suportam, então aqui vai um backup:
+
+local function update(input)
+    local delta = input.Position - dragStart
+    Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                               startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or 
+       input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or 
+       input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
